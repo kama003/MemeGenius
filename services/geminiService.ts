@@ -20,7 +20,7 @@ export const fileToB64 = (file: File | Blob): Promise<string> => {
 export const generateMemeCaptions = async (imageBase64: string): Promise<string[]> => {
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
+      model: 'gemini-2.0-flash',
       contents: {
         parts: [
           {
@@ -58,7 +58,7 @@ export const generateMemeCaptions = async (imageBase64: string): Promise<string[
 export const analyzeImageContext = async (imageBase64: string): Promise<AnalysisResult> => {
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
+      model: 'gemini-2.0-flash',
       contents: {
         parts: [
           {
