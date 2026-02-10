@@ -1,0 +1,5 @@
+{
+  "name": "MemeGenius AI",
+  "description": "An AI-powered meme generator capable of context-aware caption suggestions, natural language image editing, and deep image analysis using Gemini models.",
+  "requestFramePermissions": []
+}
