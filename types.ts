@@ -8,6 +8,8 @@ export interface MemeCaption {
   fontSize: number;
   strokeColor: string;
   strokeWidth: number;
+  textAlign: 'left' | 'center' | 'right';
+  isUppercase: boolean;
 }
 
 export interface Template {
