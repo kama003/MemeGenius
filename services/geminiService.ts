@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { AnalysisResult } from "../types";
 
@@ -17,10 +18,10 @@ export const fileToB64 = (file: File | Blob): Promise<string> => {
   });
 };
 
-export const generateMemeCaptions = async (imageBase64: string): Promise<string[]> => {
+export const generateFunnyImagePrompts = async (imageBase64: string): Promise<string[]> => {
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3-flash-preview',
       contents: {
         parts: [
           {
@@ -30,7 +31,7 @@ export const generateMemeCaptions = async (imageBase64: string): Promise<string[
             }
           },
           {
-            text: "Analyze this image and generate 5 funny, viral-style, short meme captions suitable for overlaying on this image. Return ONLY the captions."
+            text: "Analyze this image and generate 5 funny, creative, and absurd prompts to edit this image into a meme or funny situation. The prompts should be instructions for an image editing AI (e.g., 'Make the person hold a giant taco', 'Turn the background into a chaotic alien invasion'). Return ONLY the prompts."
           }
         ]
       },
@@ -50,7 +51,7 @@ export const generateMemeCaptions = async (imageBase64: string): Promise<string[
     }
     return [];
   } catch (error) {
-    console.error("Error generating captions:", error);
+    console.error("Error generating prompts:", error);
     throw error;
   }
 };
@@ -58,7 +59,7 @@ export const generateMemeCaptions = async (imageBase64: string): Promise<string[
 export const analyzeImageContext = async (imageBase64: string): Promise<AnalysisResult> => {
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3-pro-preview',
       contents: {
         parts: [
           {
@@ -104,7 +105,7 @@ export const editImageWithPrompt = async (imageBase64: string, prompt: string): 
         parts: [
           {
             inlineData: {
-              mimeType: 'image/png', // Assuming PNG for simplicity, could be detected
+              mimeType: 'image/png',
               data: imageBase64
             }
           },
@@ -114,13 +115,14 @@ export const editImageWithPrompt = async (imageBase64: string, prompt: string): 
         ]
       },
       config: {
-        responseModalities: [Modality.IMAGE],
+        imageConfig: {
+          aspectRatio: "1:1"
+        }
       }
     });
 
     const parts = response.candidates?.[0]?.content?.parts;
     if (parts && parts.length > 0) {
-        // Find the part with inlineData
         const imagePart = parts.find(p => p.inlineData);
         if (imagePart && imagePart.inlineData && imagePart.inlineData.data) {
              return imagePart.inlineData.data;
@@ -129,6 +131,38 @@ export const editImageWithPrompt = async (imageBase64: string, prompt: string): 
     throw new Error("No image generated");
   } catch (error) {
     console.error("Error editing image:", error);
+    throw error;
+  }
+};
+
+export const generateFunnyImage = async (prompt: string): Promise<string> => {
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: {
+        parts: [
+          {
+            text: `Create a funny, meme-worthy image based on this idea: ${prompt}`
+          }
+        ]
+      },
+      config: {
+        imageConfig: {
+          aspectRatio: "1:1"
+        }
+      }
+    });
+
+    const parts = response.candidates?.[0]?.content?.parts;
+    if (parts && parts.length > 0) {
+        const imagePart = parts.find(p => p.inlineData);
+        if (imagePart && imagePart.inlineData && imagePart.inlineData.data) {
+             return imagePart.inlineData.data;
+        }
+    }
+    throw new Error("No image generated");
+  } catch (error) {
+    console.error("Error generating image:", error);
     throw error;
   }
 };
